@@ -4,7 +4,7 @@ import dotenv from 'dotenv';
 import userRoutes from './routes/user.route.js';
 import authRoutes from './routes/auth.route.js';
 import postRoutes from './routes/post.route.js';
-import mentorRoutes from './routes/mentor.route.js'; // Corrected 'MentorRoutes' to 'mentorRoutes' for consistency
+import mentorRoutes from './routes/mentor.route.js'; 
 import commentRoutes from './routes/comment.route.js';
 import cookieParser from 'cookie-parser';
 import helmet from 'helmet';
@@ -29,17 +29,19 @@ class Server {
       helmet({
         contentSecurityPolicy: false,
         crossOriginEmbedderPolicy: false,
+        crossOriginOpenerPolicy: { policy: "same-origin-allow-popups" }
       })
     );
 
     this.app.use(
       cors({
         origin: [
-          'http://localhost:3000', 
+          'http://localhost:5173', 
           'https://play.deskstones.com', 
-          'https://www.deskstones.com'
+          'https://www.deskstones.com',
+          'mern-blog-4fe11.firebaseapp.com' // Add this
         ],
-        credentials: true, // Allows credentials (cookies) to be passed
+        credentials: true,
       })
     );
 
@@ -48,8 +50,11 @@ class Server {
         'Access-Control-Allow-Headers',
         'Origin, X-Requested-With, Content-Type, Accept'
       );
+
       res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
       res.header('Access-Control-Allow-Credentials', 'true');
+      res.header('Cross-Origin-Opener-Policy', 'same-origin-allow-popups');
+      res.header('Cross-Origin-Embedder-Policy', 'unsafe-none');
       next();
     });
 
