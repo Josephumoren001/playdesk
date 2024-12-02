@@ -39,7 +39,7 @@ class Server {
           'http://localhost:5173', 
           'https://play.deskstones.com', 
           'https://www.deskstones.com',
-          'mern-blog-4fe11.firebaseapp.com' // Add this
+          'mern-blog-4fe11.firebaseapp.com' 
         ],
         credentials: true,
       })
