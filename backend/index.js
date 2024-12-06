@@ -51,6 +51,8 @@ class Server {
       );
 
       res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
+      res.header('Access-Control-Allow-Origin', 'https://play.deskstones.com');
+      res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept, Authorization');
       res.header('Access-Control-Allow-Credentials', 'true');
       res.header('Cross-Origin-Opener-Policy', 'same-origin-allow-popups');
       res.header('Cross-Origin-Embedder-Policy', 'unsafe-none');
