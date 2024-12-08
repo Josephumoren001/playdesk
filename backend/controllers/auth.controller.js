@@ -3,6 +3,7 @@ import bcryptjs from "bcryptjs";
 import { errorHandler } from "../utils/error.js";
 import jwt from "jsonwebtoken";
 
+
 // Sign-in function
 export const signin = async (req, res, next) => {
   try {
@@ -22,41 +23,32 @@ export const signin = async (req, res, next) => {
       return next(errorHandler(400, "Invalid password"));
     }
 
-    // Check if JWT_SECRET is set
     if (!process.env.JWT_SECRET) {
       console.error("JWT_SECRET is not set!");
       return next(errorHandler(500, "Internal Server Error"));
-    } else {
-      console.log("JWT_SECRET is set:", process.env.JWT_SECRET); // Log the secret
     }
 
-    // Generate JWT token
     const token = jwt.sign(
       { id: validUser._id, email: validUser.email },
       process.env.JWT_SECRET,
       { expiresIn: "1d" }
     );
 
-    console.log('Generated Token:', token); // Log the token
-
     const { password: pass, ...rest } = validUser._doc;
 
     res.clearCookie("access_token");
 
-    res
-      .status(200)
-      .cookie("access_token", token, {
-        httpOnly: true,
-        secure: process.env.NODE_ENV === "production",
-        sameSite: "strict",
-        maxAge: 24 * 60 * 60 * 1000, // 1 day
-        path: "/", 
-      })
-      .json({
-        success: true,
-        user: rest,
-        token // Include token in the response for frontend use
-      });
+    res.status(200).cookie("access_token", token, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "strict",
+      maxAge: 24 * 60 * 60 * 1000, // 1 day
+      path: "/", 
+    }).json({
+      success: true,
+      user: rest, // Include user in response
+      token // Include token in the response for frontend use
+    });
   } catch (error) {
     console.error("Signin error:", error);
     next(errorHandler(500, "An error occurred during sign in"));
@@ -141,7 +133,7 @@ export const signup = async (req, res, next) => {
   }
 };
 
-// Google OAuth function
+
 // Google OAuth function
 export const google = async (req, res, next) => {
   const { email, name, googlePhotoUrl } = req.body;
@@ -156,18 +148,15 @@ export const google = async (req, res, next) => {
       );
 
       const { password, ...rest } = user._doc;
-      res
-        .status(200)
-        .cookie("access_token", token, {
-          httpOnly: true,
-          secure: process.env.NODE_ENV === "production",
-          sameSite: "strict",
-          maxAge: 24 * 60 * 60 * 1000,
-        })
-        .json({
-          user: rest, // Include user in response
-          token // Include token in the response for frontend use
-        });
+      res.status(200).cookie("access_token", token, {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === "production",
+        sameSite: "strict",
+        maxAge: 24 * 60 * 60 * 1000,
+      }).json({
+        user: rest, // Include user in response
+        token // Include token in the response for frontend use
+      });
     } else {
       const generatedPassword = Math.random().toString(36).slice(-8);
       const hashedPassword = bcryptjs.hashSync(generatedPassword, 10);
@@ -187,22 +176,20 @@ export const google = async (req, res, next) => {
       );
 
       const { password, ...rest } = newUser._doc;
-      res
-        .status(200)
-        .cookie('access_token', token, {
-          httpOnly: true,
-          secure: process.env.NODE_ENV === 'production',
-          sameSite: 'strict',
-          maxAge: 24 * 60 * 60 * 1000,
-          path: '/', 
-        })
-        .json({
-          user: rest, // Include user in response
-          token // Include token in the response for frontend use
-        });
+      res.status(200).cookie('access_token', token, {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === 'production',
+        sameSite: 'strict',
+        maxAge: 24 * 60 * 60 * 1000,
+        path: '/', 
+      }).json({
+        user: rest, // Include user in response
+        token // Include token in the response for frontend use
+      });
     }
   } catch (error) {
     next(error);
   }
 };
+
 

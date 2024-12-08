@@ -31,7 +31,8 @@ export const getposts = async (req, res, next) => {
     const startIndex = parseInt(req.query.startIndex) || 0;
     const limit = parseInt(req.query.limit) || 9;
     const sortDirection = req.query.order === 'asc' ? 1 : -1;
-    const posts = await Post.find({
+
+    const query = {
       ...(req.query.userId && { userId: req.query.userId }),
       ...(req.query.category && { category: req.query.category }),
       ...(req.query.slug && { slug: req.query.slug }),
@@ -42,15 +43,16 @@ export const getposts = async (req, res, next) => {
           { content: { $regex: req.query.searchTerm, $options: 'i' } },
         ],
       }),
-    })
+    };
+
+    const posts = await Post.find(query)
       .sort({ updatedAt: sortDirection })
       .skip(startIndex)
       .limit(limit);
 
-    const totalPosts = await Post.countDocuments();
+    const totalPosts = await Post.countDocuments(query);
 
     const now = new Date();
-
     const oneMonthAgo = new Date(
       now.getFullYear(),
       now.getMonth() - 1,
@@ -71,6 +73,8 @@ export const getposts = async (req, res, next) => {
   }
 };
 
+
+
 export const deletepost = async (req, res, next) => {
   if (!req.user.isAdmin || req.user.id !== req.params.userId) {
     return next(errorHandler(403, 'You are not allowed to delete this post'));
@@ -83,11 +87,21 @@ export const deletepost = async (req, res, next) => {
   }
 };
 
+
+
+// Update post function
 export const updatepost = async (req, res, next) => {
-  if (!req.user.isAdmin || req.user.id !== req.params.userId) {
-    return next(errorHandler(403, 'You are not allowed to update this post'));
-  }
   try {
+    // Verify user permissions
+    if (!req.user.isAdmin || req.user.id !== req.params.userId) {
+      return next(errorHandler(403, 'You are not allowed to update this post'));
+    }
+
+    // Log the IDs being used
+    console.log("Updating post with ID:", req.params.postId);
+    console.log("Request body:", req.body);
+
+    // Attempt to update the post
     const updatedPost = await Post.findByIdAndUpdate(
       req.params.postId,
       {
@@ -100,8 +114,25 @@ export const updatepost = async (req, res, next) => {
       },
       { new: true }
     );
-    res.status(200).json(updatedPost);
+
+    // Log the result of the update attempt
+    if (!updatedPost) {
+      return next(errorHandler(404, 'Post not found'));
+    }
+
+    // Return the updated post details
+    res.status(200).json({
+      success: true,
+      post: updatedPost,
+      slug: updatedPost.slug,
+      title: updatedPost.title,
+      image: updatedPost.image
+    });
   } catch (error) {
+    // Log any errors that occur
+    console.error('Update post error:', error);
     next(error);
   }
 };
+
+
