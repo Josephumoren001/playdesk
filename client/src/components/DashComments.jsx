@@ -10,10 +10,16 @@ export default function DashComments() {
   const [showMore, setShowMore] = useState(true);
   const [showModal, setShowModal] = useState(false);
   const [commentIdToDelete, setCommentIdToDelete] = useState('');
+
   useEffect(() => {
     const fetchComments = async () => {
       try {
-        const res = await fetch(`${API_URL}/comment/getcomments`);
+        const res = await fetch(`${API_URL}/comment/getcomments`, {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem('access_token')}`,
+          },
+          credentials: 'include',
+        });
         const data = await res.json();
         if (res.ok) {
           setComments(data.comments);
@@ -28,13 +34,19 @@ export default function DashComments() {
     if (currentUser.isAdmin) {
       fetchComments();
     }
-  }, [currentUser._id]);
+  }, [currentUser]);
 
   const handleShowMore = async () => {
     const startIndex = comments.length;
     try {
       const res = await fetch(
-        `${API_URL}/comment/getcomments?startIndex=${startIndex}`
+        `${API_URL}/comment/getcomments?startIndex=${startIndex}`,
+        {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem('access_token')}`,
+          },
+          credentials: 'include',
+        }
       );
       const data = await res.json();
       if (res.ok) {
@@ -55,6 +67,10 @@ export default function DashComments() {
         `${API_URL}/comment/deleteComment/${commentIdToDelete}`,
         {
           method: 'DELETE',
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem('access_token')}`,
+          },
+          credentials: 'include',
         }
       );
       const data = await res.json();

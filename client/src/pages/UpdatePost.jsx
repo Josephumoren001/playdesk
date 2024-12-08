@@ -15,7 +15,6 @@ import { useNavigate, useParams } from 'react-router-dom';
 import { useSelector } from 'react-redux';
 import { API_URL } from '../const/API_URL';
 
-
 export default function UpdatePost() {
   const [file, setFile] = useState(null);
   const [imageUploadProgress, setImageUploadProgress] = useState(null);
@@ -24,13 +23,20 @@ export default function UpdatePost() {
   const [publishError, setPublishError] = useState(null);
   const { postId } = useParams();
 
+  console.log("Post ID from useParams:", postId); // Debug log for postId
+
   const navigate = useNavigate();
-    const { currentUser } = useSelector((state) => state.user);
+  const { currentUser } = useSelector((state) => state.user);
 
   useEffect(() => {
-    try {
-      const fetchPost = async () => {
-        const res = await fetch(`${API_URL}/post/getposts?postId=${postId}`);
+    const fetchPost = async () => {
+      try {
+        const res = await fetch(`${API_URL}/post/getposts?postId=${postId}`, {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem('access_token')}`,
+            'Content-Type': 'application/json',
+          },
+        });
         const data = await res.json();
         if (!res.ok) {
           console.log(data.message);
@@ -39,17 +45,18 @@ export default function UpdatePost() {
         }
         if (res.ok) {
           setPublishError(null);
+          console.log("Fetched post data:", data.posts[0]); // Debug log to check fetched data
           setFormData(data.posts[0]);
         }
-      };
+      } catch (error) {
+        console.log(error.message);
+      }
+    };
 
-      fetchPost();
-    } catch (error) {
-      console.log(error.message);
-    }
+    fetchPost();
   }, [postId]);
 
-  const handleUpdloadImage = async () => {
+  const handleUploadImage = async () => {
     try {
       if (!file) {
         setImageUploadError('Please select an image');
@@ -85,32 +92,39 @@ export default function UpdatePost() {
       console.log(error);
     }
   };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
+    console.log("Form Data:", formData); // Debug log for formData
+    console.log("Post ID in handleSubmit:", postId); // Debug log for postId in handleSubmit
     try {
-      const res = await fetch(`${API_URL}/post/updatepost/${formData._id}/${currentUser._id}`, {
+      const res = await fetch(`${API_URL}/post/updatepost/${postId}/${currentUser._id}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
-          Authorization: `Bearer ${currentUser?.token}`,
+          Authorization: `Bearer ${localStorage.getItem('access_token')}`,
         },
         credentials: 'include',
         body: JSON.stringify(formData),
       });
       const data = await res.json();
       if (!res.ok) {
+        console.log("Update post response error:", data.message); // Log error message from response
         setPublishError(data.message);
         return;
       }
 
       if (res.ok) {
         setPublishError(null);
+        console.log("Post updated successfully:", data); // Log success message
         navigate(`/post/${data.slug}`);
       }
     } catch (error) {
+      console.error('Error updating post:', error); // Log any errors that occur
       setPublishError('Something went wrong');
     }
   };
+
   return (
     <div className='p-3 max-w-3xl mx-auto min-h-screen'>
       <h1 className='text-center text-3xl my-7 font-semibold'>Update post</h1>
@@ -125,13 +139,13 @@ export default function UpdatePost() {
             onChange={(e) =>
               setFormData({ ...formData, title: e.target.value })
             }
-            value={formData.title}
+            value={formData.title || ''}
           />
           <Select
             onChange={(e) =>
               setFormData({ ...formData, category: e.target.value })
             }
-            value={formData.category}
+            value={formData.category || 'uncategorized'}
           >
             <option value='uncategorized'>Select a category</option>
             <option value='javascript'>JavaScript</option>
@@ -150,7 +164,7 @@ export default function UpdatePost() {
             gradientDuoTone='purpleToBlue'
             size='sm'
             outline
-            onClick={handleUpdloadImage}
+            onClick={handleUploadImage}
             disabled={imageUploadProgress}
           >
             {imageUploadProgress ? (
@@ -175,7 +189,7 @@ export default function UpdatePost() {
         )}
         <ReactQuill
           theme='snow'
-          value={formData.content}
+          value={formData.content || ''}
           placeholder='Write something...'
           className='h-72 mb-12'
           required

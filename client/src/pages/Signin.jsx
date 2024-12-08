@@ -12,7 +12,7 @@ import { API_URL } from '../const/API_URL';
 
 export default function SignIn() {
   const [formData, setFormData] = useState({});
-  const { loading, error: errorMessage } = useSelector((state) => state.user);
+  const { loading, error: errorMessage, currentUser } = useSelector((state) => state.user); // Access currentUser here
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
@@ -25,6 +25,7 @@ export default function SignIn() {
     if (!formData.email || !formData.password) {
       return dispatch(signInFailure('Please fill all the fields'));
     }
+    
     try {
       dispatch(signInStart());
       const res = await fetch(`${API_URL}/auth/signin`, {
@@ -34,14 +35,22 @@ export default function SignIn() {
         body: JSON.stringify(formData),
       });
       const data = await res.json();
+      console.log('SignIn response data:', data); // Debug log
+
       if (data.success === false) {
         dispatch(signInFailure(data.message));
+        return;
       }
+
       if (res.ok) {
-        dispatch(signInSuccess(data));
+        const token = data.token; 
+        console.log('Token:', token); // Debug log
+        localStorage.setItem('access_token', token);
+        dispatch(signInSuccess({ user: data.user, token })); // Update action payload
         navigate('/');
       }
     } catch (error) {
+      console.log('SignIn error:', error); // Debug log
       dispatch(signInFailure(error.message));
     }
   };

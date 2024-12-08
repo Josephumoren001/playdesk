@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { useSelector } from 'react-redux'; // Assuming you have a Redux setup to manage user state
-import { Button } from 'flowbite-react'; // Importing Button component for admin actions
+import { useSelector } from 'react-redux';
+import { Button } from 'flowbite-react';
 import { API_URL } from '../const/API_URL';
 
 const DashMentors = () => {
@@ -8,17 +8,19 @@ const DashMentors = () => {
   const [filteredMentors, setFilteredMentors] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
-  const [filter, setFilter] = useState('all'); // 'all', 'pending', 'approved', 'unassigned'
+  const [filter, setFilter] = useState('all');
 
-  const { currentUser } = useSelector((state) => state.user); // Get current user from Redux
+  const { currentUser } = useSelector((state) => state.user);
 
   useEffect(() => {
     const fetchMentors = async () => {
       try {
         setLoading(true);
-        // Fetch all mentors without filters
         const res = await fetch(`${API_URL}/mentor/getmentors`, {
-          credentials: 'include', // Ensure cookies are sent
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem('access_token')}`,
+          },
+          credentials: 'include',
         });
         const data = await res.json();
         if (!res.ok) {
@@ -28,7 +30,7 @@ const DashMentors = () => {
         }
         if (res.ok) {
           setMentors(data);
-          setFilteredMentors(data); // Initialize with all mentors
+          setFilteredMentors(data);
           setLoading(false);
           setError(false);
         }
@@ -42,7 +44,6 @@ const DashMentors = () => {
   }, []);
 
   useEffect(() => {
-    // Apply filtering whenever the filter state changes or mentors data changes
     const applyFilter = () => {
       let filtered = [...mentors];
       if (filter === 'pending') {
@@ -57,22 +58,20 @@ const DashMentors = () => {
     applyFilter();
   }, [filter, mentors]);
 
-  // Function to handle approving a mentor
   const handleApprove = async (mentorId) => {
     try {
       const res = await fetch(`${API_URL}/mentor/approveMentor/${mentorId}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
+          Authorization: `Bearer ${localStorage.getItem('access_token')}`,
         },
-        credentials: 'include', // Send cookies containing JWT token
+        credentials: 'include',
       });
       const data = await res.json();
       if (res.ok) {
         setMentors((prevMentors) =>
-          prevMentors.map((mentor) =>
-            mentor._id === mentorId ? data : mentor
-          )
+          prevMentors.map((mentor) => (mentor._id === mentorId ? data : mentor))
         );
       } else {
         alert(`Failed to approve mentor: ${data.message}`);
@@ -83,21 +82,18 @@ const DashMentors = () => {
     }
   };
 
-  // Function to handle deleting a mentor
   const handleDeleteUser = async (mentorId) => {
     try {
       const res = await fetch(`${API_URL}/mentor/deleteMentor/${mentorId}`, {
         method: 'DELETE',
         headers: {
-          Authorization: `Bearer ${currentUser?.token}`, // Use token from currentUser for deletion
+          Authorization: `Bearer ${localStorage.getItem('access_token')}`,
         },
         credentials: 'include',
       });
       const data = await res.json();
       if (res.ok) {
-        setMentors((prevMentors) =>
-          prevMentors.filter((mentor) => mentor._id !== mentorId)
-        );
+        setMentors((prevMentors) => prevMentors.filter((mentor) => mentor._id !== mentorId));
       } else {
         alert(`Failed to delete mentor: ${data.message}`);
       }

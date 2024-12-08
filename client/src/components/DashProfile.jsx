@@ -102,29 +102,38 @@ export default function DashProfile() {
     e.preventDefault();
     setUpdateUserError(null);
     setUpdateUserSuccess(null);
-
+  
     if (Object.keys(formData).length === 0) {
       setUpdateUserError(ERROR_MESSAGES.noChanges);
       return;
     }
-
+  
     if (imageFileUploading) {
       setUpdateUserError(ERROR_MESSAGES.imageUploading);
       return;
     }
-
+  
     try {
+      const token = localStorage.getItem('access_token'); // Retrieve token from local storage
+      console.log('Token:', token); // Log the token
+      if (!token) {
+        throw new Error('Token is missing. Please sign in again.');
+      }
+  
       dispatch(updateStart());
       const res = await fetch(`${API_URL}/user/update/${currentUser._id}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`, // Ensure 'token' is defined
+          'Authorization': `Bearer ${token}` // Use the retrieved token
         },
         credentials: 'include',
         body: JSON.stringify(formData),
       });
+  
+      console.log('Response:', res); // Log the response
       const data = await res.json();
+      console.log('Response data:', data); // Log the data
       if (!res.ok) {
         dispatch(updateFailure(data.message));
         setUpdateUserError(data.message);
@@ -133,17 +142,29 @@ export default function DashProfile() {
         setUpdateUserSuccess("User's profile updated successfully");
       }
     } catch (error) {
+      console.log('Error:', error); // Log any errors
       dispatch(updateFailure(error.message));
       setUpdateUserError(error.message);
     }
   };
-
+  
+  
+  
   const handleDeleteUser = async () => {
     setShowModal(false);
     try {
+      const token = localStorage.getItem('access_token'); // Retrieve token from local storage
+      if (!token) {
+        throw new Error('Token is missing. Please sign in again.');
+      }
+  
       dispatch(deleteUserStart());
       const res = await fetch(`${API_URL}/user/delete/${currentUser._id}`, {
         method: 'DELETE',
+        headers: {
+          'Authorization': `Bearer ${token}`, // Include the token
+        },
+        credentials: 'include',
       });
       const data = await res.json();
       if (!res.ok) {
@@ -155,7 +176,7 @@ export default function DashProfile() {
       dispatch(deleteUserFailure(error.message));
     }
   };
-
+  
   const handleSignout = async () => {
     try {
       const res = await fetch(`${API_URL}/user/signout`, {

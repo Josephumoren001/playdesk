@@ -2,6 +2,7 @@ import { createSlice } from '@reduxjs/toolkit';
 
 const initialState = {
   currentUser: null,
+  token: null, // Add token to the initial state
   error: null,
   loading: false,
 };
@@ -15,9 +16,12 @@ const userSlice = createSlice({
       state.error = null;
     },
     signInSuccess: (state, action) => {
-      state.currentUser = action.payload;
+      state.currentUser = action.payload.user; // Ensure user data is updated
+      state.token = action.payload.token; // Store token in state
       state.loading = false;
       state.error = null;
+
+      localStorage.setItem('access_token', action.payload.token);
     },
     signInFailure: (state, action) => {
       state.loading = false;
@@ -28,7 +32,7 @@ const userSlice = createSlice({
       state.error = null;
     },
     updateSuccess: (state, action) => {
-      state.currentUser = action.payload;
+      state.currentUser = { ...state.currentUser, ...action.payload };
       state.loading = false;
       state.error = null;
     },
@@ -42,8 +46,11 @@ const userSlice = createSlice({
     },
     deleteUserSuccess: (state) => {
       state.currentUser = null;
+      state.token = null; // Clear token
       state.loading = false;
       state.error = null;
+
+      localStorage.removeItem('access_token');
     },
     deleteUserFailure: (state, action) => {
       state.loading = false;
@@ -51,8 +58,11 @@ const userSlice = createSlice({
     },
     signoutSuccess: (state) => {
       state.currentUser = null;
+      state.token = null; // Clear token
       state.error = null;
       state.loading = false;
+
+      localStorage.removeItem('access_token');
     },
   },
 });

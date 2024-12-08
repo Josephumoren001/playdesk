@@ -18,12 +18,8 @@ const Header = () => {
   const [searchTerm, setSearchTerm] = useState('');
 
   useEffect(() => {
-    const urlParams = new URLSearchParams(location.search);
-    const searchTermFromUrl = urlParams.get('searchTerm');
-    if (searchTermFromUrl) {
-      setSearchTerm(searchTermFromUrl);
-    }
-  }, [location.search]);
+    console.log('currentUser:', currentUser); // Debug log
+  }, [currentUser]);
 
   const handleSignout = async () => {
     try {
@@ -60,23 +56,7 @@ const Header = () => {
         <h1 className='font-bold text-3xl'>Play<span className='text-green-400'>Desk</span> </h1>
       </Link>
 
-      {/* Search Bar (visible only on large screens) */}
-      {/* <form onSubmit={handleSubmit} className=" lg:block hidden">
-        <TextInput
-          type="text"
-          placeholder="Search..."
-          rightIcon={AiOutlineSearch}
-          value={searchTerm}
-          onChange={(e) => setSearchTerm(e.target.value)}
-        />
-      </form> */}
-
-      {/* Search Button for mobile */}
-     
-
-      {/* Right-side items: Theme Toggle, User Dropdown, and Navbar Toggle */}
       <div className="flex gap-2 md:order-2">
-        {/* Theme Toggle Button */}
         <Button
           className="w-12 h-10 hidden sm:block"
           color="gray"
@@ -86,7 +66,6 @@ const Header = () => {
           {theme === 'light' ? <FaSun /> : <FaMoon />}
         </Button>
 
-        {/* User Avatar or Sign-in Button */}
         {currentUser ? (
           <Dropdown
             arrowIcon={false}
@@ -116,43 +95,15 @@ const Header = () => {
           </Link>
         )}
 
-        {/* Navbar Toggle for mobile */}
         <Navbar.Toggle />
       </div>
 
-      {/* Navbar Collapse Menu */}
       <Navbar.Collapse>
         <Navbar.Link active={path === '/'} as="div">
-          {/* <Link to="/">Home</Link> */}
         </Navbar.Link>
-        {/* <Navbar.Link active={path === '/products'} as="div">
-          <Link to="/products" target='__blank'>Products</Link>
-        </Navbar.Link>
-        <Navbar.Link active={path === '/programs'} as="div">
-          <Link to="/programs">Programs</Link>
-        </Navbar.Link> */}
-
         <Navbar.Link active={path === '/about'} as="div">
           <Link to="/about">About</Link>
         </Navbar.Link>
-        
-        {/* <Navbar.Link active={path === '/consulting'} as="div">
-          <Link to="/consulting">Consulting</Link>
-        </Navbar.Link> */}
-        {/* <Navbar.Link active={path === '/mentors'} as="div">
-          <Link to="/mentors">Mentors</Link>
-        </Navbar.Link> */}
-        {/* <Navbar.Link active={path === '/blogs'} as="div">
-          <Link to="/blogs">Blogs</Link>
-        </Navbar.Link>
-        <Navbar.Link active={path === '/media'} as="div">
-          <Link to="/media">Media</Link>
-        </Navbar.Link>
-        
-        <Navbar.Link active={path === '/contact'} as="div">
-          <Link to="/consulting">Contact Us</Link>
-        </Navbar.Link> */}
-        
       </Navbar.Collapse>
     </Navbar>
   );

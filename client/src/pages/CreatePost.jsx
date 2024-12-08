@@ -12,6 +12,7 @@ import { useState } from 'react';
 import { CircularProgressbar } from 'react-circular-progressbar';
 import 'react-circular-progressbar/dist/styles.css';
 import { useNavigate } from 'react-router-dom';
+import { useSelector } from 'react-redux';
 import { API_URL } from '../const/API_URL';
 
 export default function CreatePost() {
@@ -22,8 +23,9 @@ export default function CreatePost() {
   const [publishError, setPublishError] = useState(null);
 
   const navigate = useNavigate();
+  const { currentUser } = useSelector((state) => state.user);
 
-  const handleUpdloadImage = async () => {
+  const handleUploadImage = async () => {
     try {
       if (!file) {
         setImageUploadError('Please select an image');
@@ -59,6 +61,7 @@ export default function CreatePost() {
       console.log(error);
     }
   };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
@@ -66,7 +69,7 @@ export default function CreatePost() {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          Authorization: `Bearer ${currentUser?.token}`,
+          Authorization: `Bearer ${localStorage.getItem('access_token')}`,
         },
         credentials: 'include',
         body: JSON.stringify(formData),
@@ -76,7 +79,6 @@ export default function CreatePost() {
         setPublishError(data.message);
         return;
       }
-
       if (res.ok) {
         setPublishError(null);
         navigate(`/post/${data.slug}`);
@@ -85,6 +87,7 @@ export default function CreatePost() {
       setPublishError('Something went wrong');
     }
   };
+
   return (
     <div className='p-3 max-w-3xl mx-auto min-h-screen'>
       <h1 className='text-center text-3xl my-7 font-semibold'>Create a post</h1>
@@ -122,7 +125,7 @@ export default function CreatePost() {
             gradientDuoTone='purpleToBlue'
             size='sm'
             outline
-            onClick={handleUpdloadImage}
+            onClick={handleUploadImage}
             disabled={imageUploadProgress}
           >
             {imageUploadProgress ? (

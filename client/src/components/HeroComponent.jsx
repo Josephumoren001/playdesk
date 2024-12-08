@@ -1,5 +1,6 @@
 import React from 'react';
 import { ArrowRight } from 'lucide-react';
+import { Link } from 'react-router-dom';
 
 const HeroComponent = () => (
   <div className="relative h-screen w-full">
@@ -20,9 +21,9 @@ const HeroComponent = () => (
       <p className="text-lg md:text-xl text-gray-200 mb-8">
         when learning ceases, aging begins!
       </p>
-      <button className="flex items-center gap-2  border-green-500 text-white px-6 py-3 rounded-lg hover:bg-green-600 transition-colors font-bold">
-        Join Now <ArrowRight className="w-5 h-5" />
-      </button>
+      <Link to='library' className="flex items-center gap-2  border-green-500 text-white px-6 py-3 rounded-lg hover:bg-green-600 transition-colors font-bold">
+        Play Now <ArrowRight className="w-5 h-5" />
+      </Link>
     </div>
   </div>
 );

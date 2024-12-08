@@ -18,25 +18,32 @@ export default function DashUsers() {
   useEffect(() => {
     const fetchUsers = async () => {
       try {
-        setLoading(true);
-        const token = await getAuth().currentUser.getIdToken(); // Get Firebase ID token
-        const res = await fetch(`${API_URL}/user/getusers`, {
-          credentials: 'include',
+        const token = localStorage.getItem("access_token");
+        console.log("Token:", token); // Log the token
+        if (!token) {
+          throw new Error("Token is missing. Please sign in again.");
+        }
+
+        const res = await fetch(`${API_URL}/user/getusers?limit=5`, {
           headers: {
-            Authorization: `Bearer ${token}`, // Include the Firebase token
+            Authorization: `Bearer ${token}`,
+            'Content-Type': 'application/json',
           },
+          credentials: 'include',
         });
+        console.log("Fetch response:", res); // Log the response
         const data = await res.json();
+        console.log("Fetch data:", data); // Log the data
         if (res.ok) {
           setUsers(data.users);
-          setShowMore(data.users.length >= 9);
         } else {
           throw new Error(data.message || 'Failed to fetch users');
         }
       } catch (error) {
+        console.log(error.message);
         setError(error.message);
       } finally {
-        setLoading(false);
+        setLoading(false); // Ensure loading state is updated
       }
     };
 
@@ -48,11 +55,12 @@ export default function DashUsers() {
   const handleShowMore = async () => {
     const startIndex = users.length;
     try {
-      const token = await getAuth().currentUser.getIdToken(); // Get Firebase ID token
+      const token = localStorage.getItem("access_token");
       const res = await fetch(`${API_URL}/user/getusers?startIndex=${startIndex}`, {
         credentials: 'include',
         headers: {
-          Authorization: `Bearer ${token}`, // Include the Firebase token
+          Authorization: `Bearer ${token}`, // Include the token
+          'Content-Type': 'application/json',
         },
       });
       const data = await res.json();
@@ -69,14 +77,21 @@ export default function DashUsers() {
 
   const handleDeleteUser = async () => {
     try {
-      const token = await getAuth().currentUser.getIdToken(); // Get Firebase ID token
+      const token = localStorage.getItem("access_token");
+      console.log("Token:", token); // Log the token
+      if (!token) {
+        throw new Error("Token is missing. Please sign in again.");
+      }
+
       const res = await fetch(`${API_URL}/user/delete/${userIdToDelete}`, {
         method: 'DELETE',
-        credentials: 'include',
         headers: {
-          Authorization: `Bearer ${token}`, // Include the Firebase token
+          Authorization: `Bearer ${token}`,
+          'Content-Type': 'application/json',
         },
+        credentials: 'include',
       });
+      console.log("Fetch response:", res); // Log the response
       const data = await res.json();
       if (res.ok) {
         setUsers((prev) => prev.filter((user) => user._id !== userIdToDelete));
@@ -85,6 +100,7 @@ export default function DashUsers() {
         throw new Error(data.message || 'Failed to delete user');
       }
     } catch (error) {
+      console.log(error.message);
       setError(error.message);
     }
   };
@@ -98,10 +114,10 @@ export default function DashUsers() {
   }
 
   return (
-    <div className='table-auto overflow-x-scroll md:mx-auto p-3 scrollbar scrollbar-track-slate-100 scrollbar-thumb-slate-300 dark:scrollbar-track-slate-700 dark:scrollbar-thumb-slate-500'>
+    <div className="w-full overflow-x-auto p-3 md:mx-auto">
       {currentUser?.isAdmin && users.length > 0 ? (
         <>
-          <Table hoverable className='shadow-md'>
+          <Table hoverable className='shadow-md w-full'>
             <Table.Head>
               <Table.HeadCell>Date created</Table.HeadCell>
               <Table.HeadCell>User image</Table.HeadCell>

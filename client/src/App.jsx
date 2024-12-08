@@ -7,19 +7,16 @@ import About from './pages/About';
 import Dashboard from './pages/Dashboard';
 import Header from "./components/Header";
 import Footer from "./components/Footer";
+import '../src/firebase'
 import PrivateRoute from "./components/PrivateRoute";
 import OnlyAdminPrivateRoute from "./components/OnlyAdminPrivateRoute";
 import CreatePost from "./pages/CreatePost";
 import UpdatePost from "./pages/UpdatePost";
 import PostPage from "./pages/PostPage";
 import ScrollToTop from "./components/ScrollToTop";
-import Programs from "./pages/Programs";
-import Consulting from './pages/Consulting';
-import Mentorship from './pages/Mentorship';
+
 import Blog from "./pages/Blog";
 import Register from './components/Register';
-
-import Media from "./pages/Media";
 import BecomeMentor from "./pages/BecomeMentor";
 import Search from "./pages/Search";
 import Product from "./pages/Product";
@@ -40,13 +37,11 @@ const App = () => {
       <Route path="/sign-up" element={ <SignUp /> } />
       <Route path="/sign-in" element={ <SignIn /> } />
       <Route path='/search' element={<Search />} />
-      <Route path="/programs" element={ <Programs /> } />
-      <Route path="/consulting" element={ <Consulting /> } />
-      <Route path="/mentors" element={ <Mentorship /> } />
+   
+     
       <Route path="/products" element={ <Product /> } />
       <Route path="/blogs" element={ <Blog /> } />
       <Route path="/register" element={ <Register /> } />
-      <Route path="/media" element={ <Media /> } />
       <Route path="/becomeamentor" element={ <BecomeMentor /> } />
       
      

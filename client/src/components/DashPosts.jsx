@@ -16,7 +16,11 @@ export default function DashPosts() {
     const fetchPosts = async () => {
       if (!currentUser || !currentUser._id) return;
       try {
-        const res = await fetch(`${API_URL}/post/getposts?userId=${currentUser._id}`);
+        const res = await fetch(`${API_URL}/post/getposts?userId=${currentUser._id}`, {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem('access_token')}`,
+          },
+        });
         const data = await res.json();
         if (res.ok) {
           setUserPosts(data.posts);
@@ -39,7 +43,12 @@ export default function DashPosts() {
     const startIndex = userPosts.length;
     try {
       const res = await fetch(
-        `${API_URL}/post/getposts?userId=${currentUser._id}&startIndex=${startIndex}`
+        `${API_URL}/post/getposts?userId=${currentUser._id}&startIndex=${startIndex}`,
+        {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem('access_token')}`,
+          },
+        }
       );
       const data = await res.json();
       if (res.ok) {
@@ -56,10 +65,20 @@ export default function DashPosts() {
   const handleDeletePost = async () => {
     setShowModal(false);
     try {
+      const token = localStorage.getItem('access_token'); // Add this line
+      if (!token) {
+        throw new Error('Token is missing. Please sign in again.');
+      }
+  
       const res = await fetch(
         `${API_URL}/post/deletepost/${postIdToDelete}/${currentUser._id}`,
         {
           method: 'DELETE',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}` // Now token is defined
+          },
+          credentials: 'include',
         }
       );
       const data = await res.json();
@@ -79,11 +98,10 @@ export default function DashPosts() {
   };
 
   return (
-    <div className="table-auto overflow-x-scroll md:mx-auto p-3 scrollbar scrollbar-track-slate-100 scrollbar-thumb-slate-300 dark:scrollbar-track-slate-700 dark:scrollbar-thumb-slate-500">
-      {/* flex p-4 border-b dark:border-gray-600 text-sm */}
+    <div className="w-full overflow-x-auto p-3 md:mx-auto">
       {currentUser?.isAdmin && userPosts.length > 0 ? (
         <>
-          <Table hoverable className="shadow-md">
+          <Table hoverable className="shadow-md w-full">
             <Table.Head>
               <Table.HeadCell>Date updated</Table.HeadCell>
               <Table.HeadCell>Post image</Table.HeadCell>

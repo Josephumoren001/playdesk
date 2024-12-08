@@ -91,10 +91,10 @@ export default function DashSidebar() {
                   icon={HiOutlineUserGroup}
                   as='div'
                 >
-                  Users
+                  Players
                 </Sidebar.Item>
               </Link>
-              <Link to='/dashboard?tab=comments'>
+              {/* <Link to='/dashboard?tab=comments'>
                 <Sidebar.Item
                   active={tab === 'comments'}
                   icon={HiAnnotation}
@@ -102,8 +102,8 @@ export default function DashSidebar() {
                 >
                   Comments
                 </Sidebar.Item>
-              </Link>
-              <Link to='/dashboard?tab=mentors'>
+              </Link> */}
+              {/* <Link to='/dashboard?tab=mentors'>
                 <Sidebar.Item
                   active={tab === 'mentors'}
                   icon={FaUserAlt}
@@ -111,7 +111,7 @@ export default function DashSidebar() {
                 >
                   Mentors
                 </Sidebar.Item>
-              </Link>
+              </Link> */}
             </>
           )}
           <Sidebar.Item

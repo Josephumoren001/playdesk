@@ -1,11 +1,7 @@
 import MainHero from '../components/MainHero';
 import youtube2 from '../assets/aboutbanner.png'
-import Deckhouse from '../assets/storyimg.png';
 import { Link } from 'react-router-dom';
-import VisionMission from '../components/VisionMission';
 
-import DeskCommunities from '../components/DeskCommunities';
-import Founders from '../components/Founders';
 
 
 
